@@ -27,6 +27,7 @@ class WebCrawlerController {
             }
             const response = await axios_1.default.get(url, { headers });
             const data = response.data;
+            console.log(data);
             if (!this.cheerioInstance) {
                 this.createCheerioInstance(data); // cheerio 객체를 사용하여 데이터 로드
             }
