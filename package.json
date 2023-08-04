@@ -1,0 +1,36 @@
+{
+  "name": "stock-inquiry-express-api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "tsc && node dist/app.js"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1"
+  },
+  "main": "app.js",
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.4.6",
+    "typescript": "^5.1.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suplas/stock_inquiry_express_api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/suplas/stock_inquiry_express_api/issues"
+  },
+  "homepage": "https://github.com/suplas/stock_inquiry_express_api#readme",
+  "description": ""
+}
