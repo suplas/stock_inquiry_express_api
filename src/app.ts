@@ -1,9 +1,11 @@
-// app.ts
 import express from 'express';
-import webCrawlerRoutes from './routes/webCrawlerRoutes';
+import webCrawlerRoutes from './routes/routes';
+import db from './db';
 
 const app = express();
 const PORT = 3010;
+
+db.connect();
 
 app.use('/api', webCrawlerRoutes);
 

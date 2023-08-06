@@ -1,33 +1,48 @@
-// webCrawlerModel.ts
-export interface WebCrawlerData {
-  rank: number;
-  date: string;
-  name: string;
-  symbolCode: string;
-  code: string;
-  tradePrice: number;
-  change: string;
-  changePrice: number;
-  changeRate: number;
-  accTradeVolume: number;
-  accTradePrice: number;
-  high52wPrice: number;
-  chartSlideImage: string;
-}
+export class stockModel {
+  private rank: number;
+  private date: string;
+  private name: string;
+  private symbolCode: string;
+  private code: string;
+  private tradePrice: number;
+  private change: string;
+  private changePrice: number;
+  private changeRate: number;
+  private accTradeVolume: number;
+  private accTradePrice: number;
+  private high52wPrice: number;
+  private chartSlideImage: string;
+  private createDate: string;
 
-// 모델은 데이터를 담는 그릇으로 사용합니다.
-export class WebCrawlerModel {
-  private data: WebCrawlerData | null;
-  
-  constructor() {
-    this.data = null;
-  }
-
-  setData(data: WebCrawlerData) {
-    this.data = data;
-  }
-
-  getData(): WebCrawlerData | null {
-    return this.data;
+  constructor(
+    rank: number,
+    date: string,
+    name: string,
+    symbolCode: string,
+    code: string,
+    tradePrice: number,
+    change: string,
+    changePrice: number,
+    changeRate: number,
+    accTradeVolume: number,
+    accTradePrice: number,
+    high52wPrice: number,
+    chartSlideImage: string,
+    createDate: string
+  ) {
+    this.rank = rank;
+    this.date = date;
+    this.name = name;
+    this.symbolCode = symbolCode;
+    this.code = code;
+    this.tradePrice = tradePrice;
+    this.change = change;
+    this.changePrice = changePrice;
+    this.changeRate = changeRate;
+    this.accTradeVolume = accTradeVolume;
+    this.accTradePrice = accTradePrice;
+    this.high52wPrice = high52wPrice;
+    this.chartSlideImage = chartSlideImage;
+    this.createDate = createDate;
   }
 }

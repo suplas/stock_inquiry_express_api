@@ -1,74 +1,103 @@
-// webCrawlerController.ts
-import { Request, Response, NextFunction } from 'express';
-import axios from 'axios';
-import cheerio, { CheerioAPI } from 'cheerio';
-import { WebCrawlerData, WebCrawlerModel } from '../models/webCrawlerModel';
+import { Request, Response, NextFunction } from "express";
+import axios from "axios";
+import { stockModel } from "../models/stockModel";
+import db from "../db";
 
 export class WebCrawlerController {
-  private cheerioInstance: CheerioAPI; 
-  private webCrawlerModel: WebCrawlerModel;
+  private totalPage: Number;
+  private page: Number;
 
   constructor() {
-    this.cheerioInstance = cheerio.load('');
-    this.webCrawlerModel = new WebCrawlerModel();
+    this.totalPage = 1;
+    this.page = 1;
   }
 
-  private createCheerioInstance(data: string) {
-    this.cheerioInstance = cheerio.load(data);
-  }
-
-  async crawlWebsite(req: Request, res: Response, next: NextFunction) {
-    const url: string = "https://finance.daum.net/api/trend/trade_volume?page=1&perPage=30&fieldName=accTradeVolume&order=desc&market=KOSPI&pagination=true";
+  async getData(req: Request, res: Response, next: NextFunction) {
+    const data: stockModel[] = [];
+    const url: string =
+      "https://finance.daum.net/api/trend/trade_volume?page=" +
+      this.page +
+      "&perPage=30&fieldName=accTradeVolume&order=desc&market=KOSPI&pagination=true";
     const headers = {
-        'referer': 'http://http://finance.daum.net/qutos/A058410#home',
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
-    }
+      referer: "http://http://finance.daum.net/qutos/A058410#home",
+      "user-agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+    };
     try {
       if (!url) {
-        return res.status(400).json({ error: 'URL이 제공되지 않았습니다.' });
+        return res.status(400).json({ error: "URL이 제공되지 않았습니다." });
       }
 
-      const response = await axios.get(url, {headers});
-      const data = response.data;
+      const response = await axios.get(url, { headers });
+      const responseData = response.data;
+      const now: Date = new Date();
+    
+
+      for (let i = 0; i <= responseData["data"].length - 29; i++) {
+        const rank: number = Number(responseData["data"][i]["rank"]);
+        const date: string = responseData["data"][i]["date"];
+        const name: string = responseData["data"][i]["name"];
+        const symbolCode: string = responseData["data"][i]["symbolCode"];
+        const code: string = responseData["data"][i]["code"];
+        const tradePrice: number = Number(responseData["data"][i]["tradePrice"]);
+        const change: string = responseData["data"][i]["change"];
+        const changePrice: number = responseData["data"][i]["changePrice"];
+        const changeRate: number = Number(responseData["data"][i]["changeRate"]);
+        const accTradeVolume: number = Number(responseData["data"][i]["accTradeVolume"]);
+        const accTradePrice: number = Number(responseData["data"][i]["accTradePrice"]);
+        const high52wPrice: number = Number(responseData["data"][i]["high52wPrice"]);
+        const chartSlideImage: string = responseData["data"][i]["chartSlideImage"];
+        const createData: string = now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+
+        data.push(
+          new stockModel(
+            rank,
+            date,
+            name,
+            symbolCode,
+            code,
+            tradePrice,
+            change,
+            changePrice,
+            changeRate,
+            accTradeVolume,
+            accTradePrice,
+            high52wPrice,
+            chartSlideImage,
+            createData
+          )
+        );
+
+        const sql = "INSERT INTO st_item SET ?" ;
+        db.query(sql, data, (err, result) => {
+          if (err) {
+            console.log("Error Saving data:", err);
+            res.status(500).json({ error: "Falled to save data" });
+          } else {
+            const newData = { id: result.insrtId };
+            res.status(201).json(newData);
+          }
+        });
+      }
       console.log(data);
-      if (!this.cheerioInstance) {
-        this.createCheerioInstance(data); // cheerio 객체를 사용하여 데이터 로드
-      }
-
-      const rank: number = Number(this.cheerioInstance('rank').text());
-      const date: string = this.cheerioInstance('date').text();
-      const name: string = this.cheerioInstance('name').text();
-      const symbolCode: string = this.cheerioInstance('symbolCode').text();
-      const code: string = this.cheerioInstance('code').text();
-      const tradePrice: number = Number(this.cheerioInstance('tradePrice').text());
-      const change: string = this.cheerioInstance('change').text();
-      const changePrice: number = Number(this.cheerioInstance('changePrice').text());
-      const changeRate: number = Number(this.cheerioInstance('changeRate').text());
-      const accTradeVolume: number = Number(this.cheerioInstance('accTradeVolume').text());
-      const accTradePrice: number = Number(this.cheerioInstance('accTradePrice').text());
-      const high52wPrice: number = Number(this.cheerioInstance('high52wPrice').text());
-      const chartSlideImage: string =this.cheerioInstance('chartSlideImage').text();
-
-      const webCrawlerData: WebCrawlerData = { rank, date, name, symbolCode, code, tradePrice, change, changePrice, changeRate, accTradeVolume, accTradePrice, high52wPrice, chartSlideImage };
-      this.webCrawlerModel.setData(webCrawlerData); // 모델에 데이터 저장
-
-      res.json(webCrawlerData);
+      //res.json(responseData);
+      res.status(200).json({ message: "정상적으로 데이터가 저장 되었습니다." });
     } catch (error) {
-      next(error);
+      console.log(error);
+      res.status(500).json({ error: "Internet Server Error" });
     }
   }
 
-  getWebCrawlerData(req: Request, res: Response) {
-    const data = this.webCrawlerModel.getData(); // 모델에서 데이터 가져오기
+  // getWebCrawlerData(req: Request, res: Response) {
+  //   const data = this.stockModel.getData();
 
-    if (data) {
-      res.json(data);
-    } else {
-      res.status(404).json({ error: '데이터가 아직 수집되지 않았습니다.' });
-    }
-  }
+  //   if (data) {
+  //     res.json(data);
+  //   } else {
+  //     res.status(404).json({ error: '데이터가 아직 수집되지 않았습니다.' });
+  //   }
+  // }
 }
 
 export const webCrawlerController = new WebCrawlerController();
-export const crawlWebsite = webCrawlerController.crawlWebsite.bind(webCrawlerController);
-export const getWebCrawlerData = webCrawlerController.getWebCrawlerData.bind(webCrawlerController);
+export const getData = webCrawlerController.getData.bind(webCrawlerController);

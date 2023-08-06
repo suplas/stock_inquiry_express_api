@@ -1,10 +1,9 @@
-// webCrawlerRoutes.ts
 import { Router } from 'express';
-import { crawlWebsite, getWebCrawlerData } from '../controllers/stockController';
+import { getData } from '../controllers/stockController';
 
 const router = Router();
 
-router.get('/crawl', crawlWebsite);
-router.get('/data', getWebCrawlerData);
+router.get('/data', getData);
+// router.get('/data', getWebCrawlerData);
 
 export default router;
