@@ -7,24 +7,45 @@ const mysql_1 = __importDefault(require("mysql"));
 class Database {
     constructor() {
         this.connection = mysql_1.default.createConnection({
-            host: '127.0.0.1',
-            user: 'root',
-            password: 'root',
-            database: 'stock',
+            host: "127.0.0.1",
+            user: "root",
+            password: "root",
+            database: "stock",
         });
     }
     connect() {
         this.connection.connect((err) => {
             if (err) {
-                console.error('Error connecting to database:', err);
+                console.error("Error connecting to database:", err);
             }
             else {
-                console.log('Connected to the database');
+                console.log("Connected to the database");
             }
         });
     }
     query(sql, values, callback) {
         this.connection.query(sql, values, callback);
+    }
+    select(sql) {
+        this.query(sql, [], (err, result) => {
+            if (err) {
+                console.log("Error Saving data:", err);
+            }
+            else {
+                const newData = { id: result.insrtId };
+            }
+        });
+    }
+    insert(data) {
+        const sql = "INSERT INTO st_item SET ?";
+        this.query(sql, [data], (err, result) => {
+            if (err) {
+                console.log("Error Saving data:", err);
+            }
+            else {
+                const newData = { id: result.insrtId };
+            }
+        });
     }
 }
 const db = new Database();

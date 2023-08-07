@@ -9,7 +9,7 @@ const db_1 = __importDefault(require("./db"));
 const app = (0, express_1.default)();
 const PORT = 3010;
 db_1.default.connect();
-app.use('/api', routes_1.default);
+app.use("/api", routes_1.default);
 app.listen(PORT, () => {
     console.log(`서버가 http://localhost:${PORT}/ 에서 실행중입니다.`);
 });
