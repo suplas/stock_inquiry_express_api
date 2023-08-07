@@ -22,22 +22,12 @@ class Database {
     });
   }
 
-  private query(
+  public query(
     sql: string,
     values: any[],
     callback: (err: Error | null, result: any) => void
   ) {
     this.connection.query(sql, values, callback);
-  }
-
-  public select(sql: string) {
-    this.query(sql, [], (err, result) => {
-      if (err) {
-        console.log("Error Get data:", err);
-      } else {
-        const data = result;
-      }
-    });
   }
 
   public insert(data: {}) {

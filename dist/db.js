@@ -26,16 +26,6 @@ class Database {
     query(sql, values, callback) {
         this.connection.query(sql, values, callback);
     }
-    select(sql) {
-        this.query(sql, [], (err, result) => {
-            if (err) {
-                console.log("Error Get data:", err);
-            }
-            else {
-                const data = result;
-            }
-        });
-    }
     insert(data) {
         const sql = "INSERT INTO st_item SET ?";
         this.query(sql, [data], (err, result) => {
