@@ -22,7 +22,7 @@ class Database {
     });
   }
 
-  public query(
+  private query(
     sql: string,
     values: any[],
     callback: (err: Error | null, result: any) => void
@@ -33,9 +33,9 @@ class Database {
   public select(sql: string) {
     this.query(sql, [], (err, result) => {
       if (err) {
-        console.log("Error Saving data:", err);
+        console.log("Error Get data:", err);
       } else {
-        const newData = { id: result.insrtId };
+        const data = result;
       }
     });
   }

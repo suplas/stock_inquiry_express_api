@@ -29,10 +29,10 @@ class Database {
     select(sql) {
         this.query(sql, [], (err, result) => {
             if (err) {
-                console.log("Error Saving data:", err);
+                console.log("Error Get data:", err);
             }
             else {
-                const newData = { id: result.insrtId };
+                const data = result;
             }
         });
     }
