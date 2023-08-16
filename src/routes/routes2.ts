@@ -4,8 +4,6 @@ import { catGetData } from "../controllers/crawlingController";
 
 const router = Router();
 
-router.get("/data", getData);
-router.get("/list/:page", getStockData);
-router.get("/cat/:page", catGetData);
+router.get("/:page", catGetData);
 
 export default router;
