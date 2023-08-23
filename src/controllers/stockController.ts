@@ -78,8 +78,21 @@ export class StockController {
   async getStockData(req: Request, res: Response) {
     const page: number = Number(req.params.page);
     const curPage: number = (page -1) * 30;
-   
+    let datas: number = 0;
+    
     try {
+      const sql2 : string = 
+      "select count(*) as datas from st_item where (select max(createDate) as lastDate from st_item) = createDate order by rank asc";
+
+      db.query(sql2,[],(err,result) => {
+        if(err) {
+          console.error("Error fetching data:", err);
+          datas = 0;
+        } else {
+          datas = result[0]['datas'];
+        }
+      })
+
       const sql: string =
         "select * from st_item where (select max(createDate) as lastDate from st_item) = createDate order by rank asc limit ?,30";
 
@@ -89,9 +102,13 @@ export class StockController {
           res.status(500).json({ error: "Failed to fetch data" });
         } else {
           const data: stockModel[] = result;
-          res.status(200).json(data);
+          const totalPage: number = Math.round(datas / 30);
+          const responseData = {data : data, totalPage : totalPage, totalData : datas };
+          console.log(responseData);
+          res.status(200).json(responseData);
         }
       });
+
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Internet Server Error" });

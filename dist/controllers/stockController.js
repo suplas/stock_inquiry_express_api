@@ -62,7 +62,18 @@ class StockController {
     async getStockData(req, res) {
         const page = Number(req.params.page);
         const curPage = (page - 1) * 30;
+        let datas = 0;
         try {
+            const sql2 = "select count(*) as datas from st_item where (select max(createDate) as lastDate from st_item) = createDate order by rank asc";
+            db_1.default.query(sql2, [], (err, result) => {
+                if (err) {
+                    console.error("Error fetching data:", err);
+                    datas = 0;
+                }
+                else {
+                    datas = result[0]['datas'];
+                }
+            });
             const sql = "select * from st_item where (select max(createDate) as lastDate from st_item) = createDate order by rank asc limit ?,30";
             db_1.default.query(sql, [curPage], (err, result) => {
                 if (err) {
@@ -71,7 +82,10 @@ class StockController {
                 }
                 else {
                     const data = result;
-                    res.status(200).json(data);
+                    const totalPage = Math.round(datas / 30);
+                    const responseData = { data: data, totalPage: totalPage, totalData: datas };
+                    console.log(responseData);
+                    res.status(200).json(responseData);
                 }
             });
         }
