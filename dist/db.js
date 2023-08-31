@@ -26,9 +26,20 @@ class Database {
     query(sql, values, callback) {
         this.connection.query(sql, values, callback);
     }
-    insert(data) {
-        const sql = "INSERT INTO st_item SET ?";
+    insert(data, table) {
+        const sql = "INSERT INTO " + table + " SET ?";
         this.query(sql, [data], (err, result) => {
+            if (err) {
+                console.log("Error Saving data:", err);
+            }
+            else {
+                const newData = { id: result.insrtId };
+            }
+        });
+    }
+    insertOrUpdate(data, table) {
+        const sql = "INSERT INTO " + table + " SET ? ON DUPLICATE KEY UPDATE ?";
+        this.query(sql, [data, data], (err, result) => {
             if (err) {
                 console.log("Error Saving data:", err);
             }

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import axios from "axios";
 import { stockModel } from "../models/stockModel";
 import db from "../db";
+import { stockDetailModel } from "../models/stockDetailModel";
 
 export class StockController {
   constructor() {}
@@ -34,7 +35,6 @@ export class StockController {
           "https://finance.daum.net/api/trend/trade_volume?page=" +
           page +
           "&perPage=100&fieldName=accTradeVolume&order=desc&market=KOSPI&pagination=true";
-        console.log(url);
         const now: Date = new Date();
         const createData: string =
           now.getFullYear() +
@@ -64,7 +64,32 @@ export class StockController {
             responseData["data"][i]["chartSlideImage"],
             createData
           );
-          db.insert(data);
+          db.insert(data, "st_item");
+          // 가져온 종목의 상세정보 크롤링
+          let url: string =
+            "https://finance.daum.net/api/quotes/"+responseData["data"][i]["symbolCode"]+"?summary=false&changeStatistics=true";
+          const response2 = await axios.get(url, { headers });
+          const responseData2 = response2.data;
+          const detailData: stockDetailModel = new stockDetailModel(
+            responseData2["symbolCode"],
+            responseData2["code"],
+            Number(responseData2["openingPrice"]),
+            Number(responseData2["highPrice"]),
+            Number(responseData2["lowPrice"]),
+            Number(responseData2["tradePrice"]),
+            Number(responseData2["prevClosingPrice"]),
+            responseData2["change"],
+            Number(responseData2["changePrice"]),
+            Number(responseData2["changeRate"]),
+            responseData2["name"],
+            responseData2["market"],
+            Number(responseData2["marketCap"]),
+            Number(responseData2["marketCapRank"]),
+            responseData2["date"],
+            responseData2["tradeDate"]
+          );
+
+          db.insertOrUpdate(detailData, "st_item_detail");
         }
       }
       //res.json(responseData);
@@ -77,25 +102,23 @@ export class StockController {
 
   async getStockData(req: Request, res: Response) {
     const page: number = Number(req.params.page);
-    const curPage: number = (page -1) * 30;
+    const curPage: number = (page - 1) * 30;
     let datas: number = 0;
-    
-    try {
-      const sql2 : string = 
-      "select count(*) as datas from st_item where (select max(createDate) as lastDate from st_item) = createDate order by rank asc";
 
-      db.query(sql2,[],(err,result) => {
-        if(err) {
+    try {
+      const sql2: string =
+        "select count(*) from st_item where (select DATE_ADD(a.lastDate, INTERVAL -6 MINUTE) from (select max(createDate) as lastDate from st_item)a) <= createDate order by rank asc";
+      db.query(sql2, [], (err, result) => {
+        if (err) {
           console.error("Error fetching data:", err);
           datas = 0;
         } else {
-          datas = result[0]['datas'];
+          datas = result[0]["datas"];
         }
-      })
+      });
 
       const sql: string =
-        "select * from st_item where (select max(createDate) as lastDate from st_item) = createDate order by rank asc limit ?,30";
-
+        "select * from st_item where (select DATE_ADD(a.lastDate, INTERVAL -6 MINUTE) from (select max(createDate) as lastDate from st_item)a) <= createDate order by rank asc limit ?, 30";
       db.query(sql, [curPage], (err, result) => {
         if (err) {
           console.error("Error fetching data:", err);
@@ -103,12 +126,14 @@ export class StockController {
         } else {
           const data: stockModel[] = result;
           const totalPage: number = Math.round(datas / 30);
-          const responseData = {data : data, totalPage : totalPage, totalData : datas };
-          console.log(responseData);
+          const responseData = {
+            data: data,
+            totalPage: totalPage,
+            totalData: datas,
+          };
           res.status(200).json(responseData);
         }
       });
-
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Internet Server Error" });

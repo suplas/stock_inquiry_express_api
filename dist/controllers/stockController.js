@@ -7,6 +7,7 @@ exports.getStockData = exports.getData = exports.stockController = exports.Stock
 const axios_1 = __importDefault(require("axios"));
 const stockModel_1 = require("../models/stockModel");
 const db_1 = __importDefault(require("../db"));
+const stockDetailModel_1 = require("../models/stockDetailModel");
 class StockController {
     constructor() { }
     async getData(req, res, next) {
@@ -35,7 +36,6 @@ class StockController {
                     "https://finance.daum.net/api/trend/trade_volume?page=" +
                         page +
                         "&perPage=100&fieldName=accTradeVolume&order=desc&market=KOSPI&pagination=true";
-                console.log(url);
                 const now = new Date();
                 const createData = now.getFullYear() +
                     "-" +
@@ -48,7 +48,13 @@ class StockController {
                     now.getMinutes();
                 for (let i = 0; i <= responseData["data"].length - 1; i++) {
                     const data = new stockModel_1.stockModel(Number(responseData["data"][i]["rank"]), responseData["data"][i]["date"], responseData["data"][i]["name"], responseData["data"][i]["symbolCode"], responseData["data"][i]["code"], Number(responseData["data"][i]["tradePrice"]), responseData["data"][i]["change"], responseData["data"][i]["changePrice"], Number(responseData["data"][i]["changeRate"]), Number(responseData["data"][i]["accTradeVolume"]), Number(responseData["data"][i]["accTradePrice"]), Number(responseData["data"][i]["high52wPrice"]), responseData["data"][i]["chartSlideImage"], createData);
-                    db_1.default.insert(data);
+                    db_1.default.insert(data, "st_item");
+                    // 가져온 종목의 상세정보 크롤링
+                    let url = "https://finance.daum.net/api/quotes/" + responseData["data"][i]["symbolCode"] + "?summary=false&changeStatistics=true";
+                    const response2 = await axios_1.default.get(url, { headers });
+                    const responseData2 = response2.data;
+                    const detailData = new stockDetailModel_1.stockDetailModel(responseData2["symbolCode"], responseData2["code"], Number(responseData2["openingPrice"]), Number(responseData2["highPrice"]), Number(responseData2["lowPrice"]), Number(responseData2["tradePrice"]), Number(responseData2["prevClosingPrice"]), responseData2["change"], Number(responseData2["changePrice"]), Number(responseData2["changeRate"]), responseData2["name"], responseData2["market"], Number(responseData2["marketCap"]), Number(responseData2["marketCapRank"]), responseData2["date"], responseData2["tradeDate"]);
+                    db_1.default.insertOrUpdate(detailData, "st_item_detail");
                 }
             }
             //res.json(responseData);
@@ -64,17 +70,17 @@ class StockController {
         const curPage = (page - 1) * 30;
         let datas = 0;
         try {
-            const sql2 = "select count(*) as datas from st_item where (select max(createDate) as lastDate from st_item) = createDate order by rank asc";
+            const sql2 = "select count(*) from st_item where (select DATE_ADD(a.lastDate, INTERVAL -6 MINUTE) from (select max(createDate) as lastDate from st_item)a) <= createDate order by rank asc";
             db_1.default.query(sql2, [], (err, result) => {
                 if (err) {
                     console.error("Error fetching data:", err);
                     datas = 0;
                 }
                 else {
-                    datas = result[0]['datas'];
+                    datas = result[0]["datas"];
                 }
             });
-            const sql = "select * from st_item where (select max(createDate) as lastDate from st_item) = createDate order by rank asc limit ?,30";
+            const sql = "select * from st_item where (select DATE_ADD(a.lastDate, INTERVAL -6 MINUTE) from (select max(createDate) as lastDate from st_item)a) <= createDate order by rank asc limit ?, 30";
             db_1.default.query(sql, [curPage], (err, result) => {
                 if (err) {
                     console.error("Error fetching data:", err);
@@ -83,8 +89,11 @@ class StockController {
                 else {
                     const data = result;
                     const totalPage = Math.round(datas / 30);
-                    const responseData = { data: data, totalPage: totalPage, totalData: datas };
-                    console.log(responseData);
+                    const responseData = {
+                        data: data,
+                        totalPage: totalPage,
+                        totalData: datas,
+                    };
                     res.status(200).json(responseData);
                 }
             });

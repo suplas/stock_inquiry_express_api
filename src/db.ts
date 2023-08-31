@@ -30,8 +30,8 @@ class Database {
     this.connection.query(sql, values, callback);
   }
 
-  public insert(data: {}) {
-    const sql = "INSERT INTO st_item SET ?";
+  public insert(data: {}, table:string) {
+    const sql = "INSERT INTO "+table+" SET ?";
 
     this.query(sql, [data], (err, result) => {
       if (err) {
@@ -41,7 +41,20 @@ class Database {
       }
     });
   }
+
+  public insertOrUpdate(data: {}, table:string) {
+    const sql = "INSERT INTO "+table+" SET ? ON DUPLICATE KEY UPDATE ?";
+
+    this.query(sql, [data, data], (err, result) => {
+      if (err) {
+        console.log("Error Saving data:", err);
+      } else {
+        const newData = { id: result.insrtId };
+      }
+    });
+  }
 }
+
 
 const db = new Database();
 export default db;
