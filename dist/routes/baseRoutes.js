@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const krxStockController_1 = require("../controllers/krxStockController");
+const stockController_1 = require("../controllers/stockController");
 const router = (0, express_1.Router)();
-router.get("/pull", krxStockController_1.getData);
+router.get("/data", stockController_1.getData);
+router.get("/list/:page", stockController_1.getStockData);
 exports.default = router;
