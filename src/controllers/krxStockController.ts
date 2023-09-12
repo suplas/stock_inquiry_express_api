@@ -1,25 +1,23 @@
 import { Request, Response, NextFunction } from "express";
 import axios from "axios";
-import db from "../db";
+require('dotenv').config();
 
 class KrxStockContoller {
-  private url: string;
-  private key: string;
+  private api_url: string;
   constructor() {
-    this.url =
-      "http://data-dbg.krx.co.kr/svc/apis/sto/stk_bydd_trd?basDd=20230901";
-    this.key = "D56A1EF0E8BC439384C7DC8519A3FCA59C675A84";
+    this.api_url = "http://data-dbg.krx.co.kr/svc/apis/sto/stk_bydd_trd?basDd=20230901";
   }
 
   async getData(req: Request, res: Response, next: NextFunction) {
+    console.log(process.env.KRX_SECRET_KEY);
     const headers = {
-        "AUTH_KEY": this.key
+        "AUTH_KEY": process.env.KRX_SECRET_KEY
     };
 
     try {
       const date = new Date();
       //const basDd = date.
-      const response = await axios.get(this.url, { headers });
+      const response = await axios.get(this.api_url, { headers });
       const responseData = response.data;
       res.json(responseData)
     } catch (error) {

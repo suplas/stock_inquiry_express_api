@@ -5,22 +5,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getData = void 0;
 const axios_1 = __importDefault(require("axios"));
+require('dotenv').config();
 class KrxStockContoller {
     constructor() {
-        // this.url =
-        //   "http://data-dbg.krx.co.kr/svc/sample/apis/sto/stk_bydd_trd?basDd=20230901";
-        this.url =
-            "http://data-dbg.krx.co.kr/svc/apis/sto/stk_bydd_trd?basDd=20230901";
-        this.key = "D56A1EF0E8BC439384C7DC8519A3FCA59C675A84";
+        this.api_url = "http://data-dbg.krx.co.kr/svc/apis/sto/stk_bydd_trd?basDd=20230901";
     }
     async getData(req, res, next) {
+        console.log(process.env.KRX_SECRET_KEY);
         const headers = {
-            "AUTH_KEY": this.key
+            "AUTH_KEY": process.env.KRX_SECRET_KEY
         };
         try {
             const date = new Date();
             //const basDd = date.
-            const response = await axios_1.default.get(this.url, { headers });
+            const response = await axios_1.default.get(this.api_url, { headers });
             const responseData = response.data;
             res.json(responseData);
         }

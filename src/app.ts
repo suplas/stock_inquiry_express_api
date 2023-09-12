@@ -7,7 +7,7 @@ import db from "./db"
 const app = express()
 const PORT = 3000
 
-db.connect()
+//db.connect()
 
 app.use("/api", routes)
 app.use("/krx/api", routes2)
