@@ -9,7 +9,6 @@ class KrxStockContoller {
   }
 
   async getData(req: Request, res: Response, next: NextFunction) {
-    console.log(process.env.KRX_SECRET_KEY);
     const headers = {
         "AUTH_KEY": process.env.KRX_SECRET_KEY
     };

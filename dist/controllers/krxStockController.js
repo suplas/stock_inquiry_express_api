@@ -11,7 +11,6 @@ class KrxStockContoller {
         this.api_url = "http://data-dbg.krx.co.kr/svc/apis/sto/stk_bydd_trd?basDd=20230901";
     }
     async getData(req, res, next) {
-        console.log(process.env.KRX_SECRET_KEY);
         const headers = {
             "AUTH_KEY": process.env.KRX_SECRET_KEY
         };

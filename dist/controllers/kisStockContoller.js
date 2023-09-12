@@ -1,18 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getVolumeRank = void 0;
+require("dotenv").config();
 class KisStockContoller {
     constructor() {
-        this.host =
-            "https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/volume-rank";
-        this.appKey = "PSyHlOYo6SG0SZ7AgqwM3GhGwjlSoKcCwn63";
-        this.appSecretKey =
-            "43RPAZhp1A0VnI3NDoDIhDujyRt9L4AWd1aiWt3NVcBxe1PKtGmwduC9k2mitkif9pSq0E4KbMSAVGF4zwOfsbi6hJgn3aYWn07+t97ep8PnTJq3u/JwSb0B5E09gUo/+hCV4FrGC2iAzBLvW0bsDne9UaY8XWPXy+2NSgtb5xa83GFaqwE=";
+        this.host = "https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/volume-rank";
         this.header = {
             "content-type": "application/json; charset=utf-8",
-            appkey: this.appKey,
-            appsecret: this.appSecretKey,
-            tr_id: "FHPST01710000",
+            appkey: process.env.KIS_APP_KEY,
+            appsecret: process.env.KIS_APP_SECRET_KEY,
+            tr_id: process.env.KIS_TR_ID,
             custtype: "P",
         };
         this.parameter = {
@@ -28,7 +25,9 @@ class KisStockContoller {
             FID_VOL_CNT: '""',
             FID_INPUT_DATE_1: '""',
         };
-        this.requestUrl = this.host + `?FID_COND_MRKT_DIV_CODE=${this.parameter.FID_COND_MRKT_DIV_CODE}&FID_COND_SCR_DIV_CODE=${this.parameter.FID_COND_SCR_DIV_CODE}$FID_INPUT_ISCD=${this.parameter.FID_INPUT_ISCD}$FID_DIV_CLS_CODE=${this.parameter.FID_DIV_CLS_CODE}$FID_BLNG_CLS_CODE=${this.parameter.FID_BLNG_CLS_CODE}$FID_TRGT_CLS_CODE=${this.parameter.FID_TRGT_CLS_CODE}$FID_TRGT_EXLS_CLS_CODE=${this.parameter.FID_TRGT_EXLS_CLS_CODE}$FID_INPUT_PRICE_1=${this.parameter.FID_INPUT_PRICE_1}$FID_INPUT_PRICE_2=${this.parameter.FID_INPUT_PRICE_2}$FID_VOL_CNT=${this.parameter.FID_VOL_CNT}$FID_INPUT_DATE_1=${this.parameter.FID_INPUT_DATE_1}`;
+        this.requestUrl =
+            this.host +
+                `?FID_COND_MRKT_DIV_CODE=${this.parameter.FID_COND_MRKT_DIV_CODE}&FID_COND_SCR_DIV_CODE=${this.parameter.FID_COND_SCR_DIV_CODE}$FID_INPUT_ISCD=${this.parameter.FID_INPUT_ISCD}$FID_DIV_CLS_CODE=${this.parameter.FID_DIV_CLS_CODE}$FID_BLNG_CLS_CODE=${this.parameter.FID_BLNG_CLS_CODE}$FID_TRGT_CLS_CODE=${this.parameter.FID_TRGT_CLS_CODE}$FID_TRGT_EXLS_CLS_CODE=${this.parameter.FID_TRGT_EXLS_CLS_CODE}$FID_INPUT_PRICE_1=${this.parameter.FID_INPUT_PRICE_1}$FID_INPUT_PRICE_2=${this.parameter.FID_INPUT_PRICE_2}$FID_VOL_CNT=${this.parameter.FID_VOL_CNT}$FID_INPUT_DATE_1=${this.parameter.FID_INPUT_DATE_1}`;
     }
     async getVolumeRank(req, res, next) {
         try {
