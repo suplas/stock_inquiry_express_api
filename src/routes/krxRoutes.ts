@@ -3,6 +3,6 @@ import { getData} from "../controllers/krxStockController";
 
 const router = Router();
 
-router.get("/pull", getData);
+router.get("/pull/:basDd", getData);
 
 export default router;
