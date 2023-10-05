@@ -1,4 +1,4 @@
-export class stockModel {
+export class StockModel {
   private rank: number;
   private date: string;
   private name: string;

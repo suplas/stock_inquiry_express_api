@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stockModel = void 0;
-class stockModel {
+exports.StockModel = void 0;
+class StockModel {
     constructor(rank, date, name, symbolCode, code, tradePrice, change, changePrice, changeRate, accTradeVolume, accTradePrice, high52wPrice, chartSlideImage, createDate) {
         this.rank = rank;
         this.date = date;
@@ -19,4 +19,4 @@ class stockModel {
         this.createDate = createDate;
     }
 }
-exports.stockModel = stockModel;
+exports.StockModel = StockModel;

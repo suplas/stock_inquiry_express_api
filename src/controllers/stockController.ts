@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import axios from "axios";
-import { stockModel } from "../models/stockModel";
+import { StockModel } from "../models/stockModel";
 import db from "../db";
 import { stockDetailModel } from "../models/stockDetailModel";
 
@@ -48,7 +48,7 @@ export class StockController {
           now.getMinutes();
 
         for (let i = 0; i <= responseData["data"].length - 1; i++) {
-          const data: stockModel = new stockModel(
+          const data: StockModel = new StockModel(
             Number(responseData["data"][i]["rank"]),
             responseData["data"][i]["date"],
             responseData["data"][i]["name"],
@@ -124,7 +124,7 @@ export class StockController {
           console.error("Error fetching data:", err);
           res.status(500).json({ error: "Failed to fetch data" });
         } else {
-          const data: stockModel[] = result;
+          const data: StockModel[] = result;
           const totalPage: number = Math.round(datas / 30);
           const responseData = {
             data: data,

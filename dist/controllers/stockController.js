@@ -47,7 +47,7 @@ class StockController {
                     ":" +
                     now.getMinutes();
                 for (let i = 0; i <= responseData["data"].length - 1; i++) {
-                    const data = new stockModel_1.stockModel(Number(responseData["data"][i]["rank"]), responseData["data"][i]["date"], responseData["data"][i]["name"], responseData["data"][i]["symbolCode"], responseData["data"][i]["code"], Number(responseData["data"][i]["tradePrice"]), responseData["data"][i]["change"], responseData["data"][i]["changePrice"], Number(responseData["data"][i]["changeRate"]), Number(responseData["data"][i]["accTradeVolume"]), Number(responseData["data"][i]["accTradePrice"]), Number(responseData["data"][i]["high52wPrice"]), responseData["data"][i]["chartSlideImage"], createData);
+                    const data = new stockModel_1.StockModel(Number(responseData["data"][i]["rank"]), responseData["data"][i]["date"], responseData["data"][i]["name"], responseData["data"][i]["symbolCode"], responseData["data"][i]["code"], Number(responseData["data"][i]["tradePrice"]), responseData["data"][i]["change"], responseData["data"][i]["changePrice"], Number(responseData["data"][i]["changeRate"]), Number(responseData["data"][i]["accTradeVolume"]), Number(responseData["data"][i]["accTradePrice"]), Number(responseData["data"][i]["high52wPrice"]), responseData["data"][i]["chartSlideImage"], createData);
                     db_1.default.insert(data, "st_item");
                     // 가져온 종목의 상세정보 크롤링
                     let url = "https://finance.daum.net/api/quotes/" + responseData["data"][i]["symbolCode"] + "?summary=false&changeStatistics=true";

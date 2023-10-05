@@ -25,7 +25,6 @@ class Database {
         });
     }
     query(sql, values, callback) {
-        //console.log(this.connection.query(sql, values, callback));
         this.connection.query(sql, values, callback);
     }
     insert(data, table) {

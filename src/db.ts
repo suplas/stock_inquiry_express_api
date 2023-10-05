@@ -1,14 +1,16 @@
 import mysql from "mysql";
 
+require("dotenv").config();
+
 class Database {
   private connection: mysql.Connection;
 
   constructor() {
     this.connection = mysql.createConnection({
-      host: "127.0.0.1",
-      user: "root",
-      password: "root",
-      database: "stock",
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
     });
   }
 
@@ -27,7 +29,9 @@ class Database {
     values: any[],
     callback: (err: Error | null, result: any) => void
   ) {
-    this.connection.query(sql, values, callback);
+    
+    //console.log(this.connection.query(sql, values, callback));
+    this.connection.query(sql, values, callback)
   }
 
   public insert(data: {}, table:string) {
