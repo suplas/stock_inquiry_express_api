@@ -4,6 +4,6 @@ import { getData, getStocList} from "../controllers/krxStockController";
 const router = Router();
 
 router.get("/pull/:basDd", getData);
-router.get("/list/:page", getStocList);
+router.get("/list/:page/:basDd?", getStocList);
 
 export default router;
