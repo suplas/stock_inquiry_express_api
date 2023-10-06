@@ -32,25 +32,31 @@ class KrxStockContoller {
             // kospi and kosdaq data sum
             responseData.push(...kospiResponseData["OutBlock_1"]);
             responseData.push(...kosdaqResponseData["OutBlock_1"]);
-            // sum data db insert
-            for (let i = 0; i <= responseData.length - 1; i++) {
-                const data = new krxStockModel_1.KrxStockModel(responseData[i]["BAS_DD"], // 기준일자
-                responseData[i]["ISU_CD"], // 종목코드
-                responseData[i]["ISU_NM"], // 종목명
-                responseData[i]["MKT_NM"], // 시장구분
-                responseData[i]["SECT_TP_NM"], // 소속부
-                responseData[i]["TDD_CLSPRC"], // 종가
-                responseData[i]["CMPPREVDD_PRC"], // 대비
-                responseData[i]["FLUC_RT"], // 등락률
-                responseData[i]["TDD_OPNPRC"], // 시가
-                responseData[i]["TDD_HGPRC"], // 고가
-                responseData[i]["TDD_LWPRC"], //저가
-                responseData[i]["ACC_TRDVOL"], // 거래량
-                responseData[i]["ACC_TRDVAL"], // 거래대금
-                responseData[i]["MKTCAP"], // 시가총액
-                responseData[i]["LIST_SHRS"] // 상장주식수
-                );
-                db_1.default.insert(data, "ST_ITEM");
+            console.log(responseData);
+            if (responseData.length <= 0) {
+                res.status(500).json({ error: "no response data" });
+            }
+            else {
+                // sum data db insert
+                for (let i = 0; i <= responseData.length - 1; i++) {
+                    const data = new krxStockModel_1.KrxStockModel(responseData[i]["BAS_DD"], // 기준일자
+                    responseData[i]["ISU_CD"], // 종목코드
+                    responseData[i]["ISU_NM"], // 종목명
+                    responseData[i]["MKT_NM"], // 시장구분
+                    responseData[i]["SECT_TP_NM"], // 소속부
+                    responseData[i]["TDD_CLSPRC"], // 종가
+                    responseData[i]["CMPPREVDD_PRC"], // 대비
+                    responseData[i]["FLUC_RT"], // 등락률
+                    responseData[i]["TDD_OPNPRC"], // 시가
+                    responseData[i]["TDD_HGPRC"], // 고가
+                    responseData[i]["TDD_LWPRC"], //저가
+                    responseData[i]["ACC_TRDVOL"], // 거래량
+                    responseData[i]["ACC_TRDVAL"], // 거래대금
+                    responseData[i]["MKTCAP"], // 시가총액
+                    responseData[i]["LIST_SHRS"] // 상장주식수
+                    );
+                    db_1.default.insert(data, "ST_ITEM");
+                }
             }
             //res.json(responseData);
             res.status(200).json({ message: "정상적으로 데이터가 저장 되었습니다." });
@@ -61,14 +67,20 @@ class KrxStockContoller {
         }
     }
     async getStocList(req, res) {
-        var _a, _b;
-        const basDd = (_a = req.params.basDd) !== null && _a !== void 0 ? _a : "(select max(BAS_DD) from ST_ITEM )";
+        var _a;
+        const basDd = Number(req.params.basDd);
         const page = Number(req.params.page);
         const curPage = (page - 1) * 30;
-        const mktcap = (_b = req.params.mktcap) !== null && _b !== void 0 ? _b : 20000000000;
+        const mktcap = (_a = req.params.mktcap) !== null && _a !== void 0 ? _a : 20000000000;
         let datas = 0;
+        let where = "(select max(BAS_DD) from ST_ITEM )";
+        if (typeof (basDd) === "number") {
+            if (basDd > 0) {
+                where = String(basDd);
+            }
+        }
         try {
-            db_1.default.query(`select id, BAS_DD, MKT_NM, ISU_NM, ACC_TRDVOL, MKTCAP, TDD_OPNPRC from ST_ITEM where ${basDd} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc`, [mktcap], (err, result) => {
+            db_1.default.query(`select count(*)as num from ST_ITEM where ${where} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc`, [mktcap], (err, result) => {
                 if (err) {
                     console.error("Error fetching data:", err);
                     datas = 0;
@@ -77,7 +89,7 @@ class KrxStockContoller {
                     datas = result[0]["num"];
                 }
             });
-            db_1.default.query(`select id, BAS_DD, MKT_NM, ISU_NM, ACC_TRDVOL, MKTCAP, TDD_OPNPRC from ST_ITEM where ${basDd} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc limit ?, 30`, [mktcap, curPage], (err, result) => {
+            db_1.default.query(`select id, BAS_DD, MKT_NM, ISU_NM, ACC_TRDVOL, MKTCAP, TDD_OPNPRC from ST_ITEM where ${where} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc limit ?, 30`, [mktcap, curPage], (err, result) => {
                 if (err) {
                     console.error("Error fetching data:", err);
                     res.status(500).json({ error: "Failed to fetch data" });
