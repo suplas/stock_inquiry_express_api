@@ -32,7 +32,6 @@ class KrxStockContoller {
             // kospi and kosdaq data sum
             responseData.push(...kospiResponseData["OutBlock_1"]);
             responseData.push(...kosdaqResponseData["OutBlock_1"]);
-            console.log(responseData);
             if (responseData.length <= 0) {
                 res.status(500).json({ error: "no response data" });
             }

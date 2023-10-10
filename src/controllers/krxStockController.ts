@@ -22,7 +22,7 @@ class KrxStockContoller {
     const headers = {
       AUTH_KEY: process.env.KRX_SECRET_KEY,
     };
-    console.log(process.env.KRX_SECRET_KEY);
+
     try {
       // kospi data pull
       const kospiResponse = await axios.get(kospiUrl, { headers });
