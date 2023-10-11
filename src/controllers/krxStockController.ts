@@ -80,7 +80,7 @@ class KrxStockContoller {
     let datas: number = 0;
     let where: string = "(select max(BAS_DD) from ST_ITEM )";
     let limitNum: number = limit > 30 ? 30 : limit;
-    let pageNum: number = curPage > 0 ? 0 : curPage;
+    let pageNum: number = curPage < 0 ? 0 : curPage;
 
     if(typeof(basDd) === "number") {
       if(basDd > 0){
@@ -90,7 +90,7 @@ class KrxStockContoller {
 
     if(Number.isNaN(limit)) {
       limitNum = 30;
-      pageNum = 0;
+      pageNum = (page - 1) * limitNum;
     }
 
     try {

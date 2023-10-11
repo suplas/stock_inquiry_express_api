@@ -75,7 +75,7 @@ class KrxStockContoller {
         let datas = 0;
         let where = "(select max(BAS_DD) from ST_ITEM )";
         let limitNum = limit > 30 ? 30 : limit;
-        let pageNum = curPage > 0 ? 0 : curPage;
+        let pageNum = curPage < 0 ? 0 : curPage;
         if (typeof (basDd) === "number") {
             if (basDd > 0) {
                 where = String(basDd);
@@ -83,7 +83,7 @@ class KrxStockContoller {
         }
         if (Number.isNaN(limit)) {
             limitNum = 30;
-            pageNum = 0;
+            pageNum = (page - 1) * limitNum;
         }
         try {
             db_1.default.query(`select count(*)as num from ST_ITEM where ${where} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc`, [mktcap], (err, result) => {
