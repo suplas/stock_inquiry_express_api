@@ -68,15 +68,22 @@ class KrxStockContoller {
     async getStocList(req, res) {
         var _a;
         const basDd = Number(req.params.basDd);
+        const limit = Number(req.params.limit);
         const page = Number(req.params.page);
-        const curPage = (page - 1) * 30;
+        const curPage = (page - 1) * limit;
         const mktcap = (_a = req.params.mktcap) !== null && _a !== void 0 ? _a : 20000000000;
         let datas = 0;
         let where = "(select max(BAS_DD) from ST_ITEM )";
+        let limitNum = limit > 30 ? 30 : limit;
+        let pageNum = curPage > 0 ? 0 : curPage;
         if (typeof (basDd) === "number") {
             if (basDd > 0) {
                 where = String(basDd);
             }
+        }
+        if (Number.isNaN(limit)) {
+            limitNum = 30;
+            pageNum = 0;
         }
         try {
             db_1.default.query(`select count(*)as num from ST_ITEM where ${where} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc`, [mktcap], (err, result) => {
@@ -88,7 +95,7 @@ class KrxStockContoller {
                     datas = result[0]["num"];
                 }
             });
-            db_1.default.query(`select id, BAS_DD, MKT_NM, ISU_NM, ACC_TRDVOL, MKTCAP, TDD_OPNPRC from ST_ITEM where ${where} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc limit ?, 30`, [mktcap, curPage], (err, result) => {
+            db_1.default.query(`select id, BAS_DD, MKT_NM, ISU_NM, ACC_TRDVOL, MKTCAP, TDD_OPNPRC from ST_ITEM where ${where} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc limit ?, ?`, [mktcap, pageNum, limitNum], (err, result) => {
                 if (err) {
                     console.error("Error fetching data:", err);
                     res.status(500).json({ error: "Failed to fetch data" });

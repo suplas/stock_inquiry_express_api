@@ -79,11 +79,18 @@ class KrxStockContoller {
     const mktcap: string = req.params.mktcap ?? 20000000000;
     let datas: number = 0;
     let where: string = "(select max(BAS_DD) from ST_ITEM )";
+    let limitNum: number = limit > 30 ? 30 : limit;
+    let pageNum: number = curPage > 0 ? 0 : curPage;
 
     if(typeof(basDd) === "number") {
       if(basDd > 0){
         where = String(basDd);
       }
+    }
+
+    if(Number.isNaN(limit)) {
+      limitNum = 30;
+      pageNum = 0;
     }
 
     try {
@@ -101,8 +108,8 @@ class KrxStockContoller {
       );
 
       db.query(
-        `select id, BAS_DD, MKT_NM, ISU_NM, ACC_TRDVOL, MKTCAP, TDD_OPNPRC from ST_ITEM where ${where} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc limit ?, 30`,
-        [mktcap, curPage],
+        `select id, BAS_DD, MKT_NM, ISU_NM, ACC_TRDVOL, MKTCAP, TDD_OPNPRC from ST_ITEM where ${where} = BAS_DD and MKTCAP > ? order by ACC_TRDVOL desc limit ?, ?`,
+        [mktcap, pageNum, limitNum],
         (err, result) => {
           if (err) {
             console.error("Error fetching data:", err);
