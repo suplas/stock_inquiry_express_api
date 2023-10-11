@@ -73,8 +73,9 @@ class KrxStockContoller {
 
   async getStocList(req: Request, res: Response) {
     const basDd: number = Number(req.params.basDd);
+    const limit:number = Number(req.params.limit);
     const page: number = Number(req.params.page);
-    const curPage: number = (page - 1) * 30;
+    const curPage: number = (page - 1) * limit;
     const mktcap: string = req.params.mktcap ?? 20000000000;
     let datas: number = 0;
     let where: string = "(select max(BAS_DD) from ST_ITEM )";
